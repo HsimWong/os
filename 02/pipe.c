@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<math.h>
-
+#include<stdlib.h>
 /*
  *	The code below is for perperation
  * 	of sending messages in random length
@@ -35,31 +35,49 @@ int main(int argc, char const *argv[])
 {
 	/* code */
 
-	
-	
-	int pipe(int field[2]);
-	// field[0] is for reading, while field[1] is for writing.
+
+	int field[2];
+	pipe(field);
+
+	printf("getpid() = %d\n", getpid());
 	int pid_1 = fork();
-	int pid_2 = fork();
+	printf("pid = %d\n", pid_1);
+	// field[0] is for reading, while field[1] is for writing.
+	// as to the perspective from the son process
+	// int pid_1 = fork();
+	// int pid_2 = fork();
+
+
+	int info_dig = 30;
 
 	// int byte_num;
-	if(pid_1 > 1){
-		wait(pid_1);
-		char * buf_1 = "Child 1 is sending a message.\n";
-		write(field[1], buf_1, strlen(buf_1));
-	}
+	// The son_1 process
 	
-	else if(pid_2 > 1){
-		wait(pid_2);
-		char * buf_2 = "Child 2 is sending a message.\n";
-		write(field[1], buf_2, strlen(buf_2));
-	}
+	// if(!wait(pid_1)){
+	// 	// wait(pid_1);
+	// 	close(field[0]);
+	// 	printf("%d", getpid());
+	// 	char * buf_1 = "Child 1 is sending a message.\n";
+	// 	write(field[1], buf_1, info_dig);
+	// 	// exit(0);
+	// }
+	
+	// else if(pid_2 == 0){
+	// 	wait(pid_2);
+	// 	close(field[0]);
+	// 	char * buf_2 = "Child 2 is sending a message.\n";
+	// 	write(field[1], buf_2, info_dig);
+	// 	exit(0);
+	// }
 
-	else{
-		 char * read_1;
-		 char * read_2;
-
-	}
+	// else if(pid_1 != 0){
+	// 	printf("%d\n", pid_1);
+	// 	 char * read_buf;
+	// 	 close(field[1]);
+	// 	 read(field[0], read_buf, info_dig);
+	// 	 printf("%s\n", read_buf);
+	// 	 exit(0);
+	// }
 
 
 	return 0;
