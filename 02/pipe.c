@@ -2,30 +2,41 @@
 #include<unistd.h>
 #include<math.h>
 
+/*
+ *	The code below is for perperation
+ * 	of sending messages in random length
+ *	without decomposing strings.
+ *
+ *	This part will be finished in the 
+ *	near future
+ */
 
-char * int2str(int a){
-	int digit = 1 + log10(a);
-	char * ret[digit];
-	// for(int i = digit - 1; i > 0; i--){
-	// 	ret[digit - i - 1]
-	// }
-	for (int i = 0; i < digit; i++){
-		char temp = (char)(48 + a % pow(10, i + 1))
-		ret[i] = temp;
-	}
-	return i;
-}
+// char * int2str(int a){
+// 	int digit = 1 + log10(a);
+// 	char * ret[digit];
+// 	// for(int i = digit - 1; i > 0; i--){
+// 	// 	ret[digit - i - 1]
+// 	// }
+// 	for (int i = 0; i < digit; i++){
+// 		char temp = (char)(48 + a % pow(10, i + 1))
+// 		ret[i] = temp;
+// 	}
+// 	return i;
+// }
 
-int str2int(char * str){
-	int digit = strlen(str);
-	for(int i = 0; i < digit; i++){
-		
-	}
-}
+// int str2int(char * str){
+// 	int digit = strlen(str);
+// 	for(int i = 0; i < digit; i++){
+
+// 	}
+// }
 
 int main(int argc, char const *argv[])
 {
 	/* code */
+
+	
+	
 	int pipe(int field[2]);
 	// field[0] is for reading, while field[1] is for writing.
 	int pid_1 = fork();
