@@ -1,5 +1,5 @@
-#include<stdio.h>
-#include<pthread.h>
+#include <stdio.h>
+#include <pthread.h>
 
 void myThread1(){
 	printf("This line is printed by thread 1\n");
