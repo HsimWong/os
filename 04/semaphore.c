@@ -15,7 +15,6 @@ int have_num_0;
 int have_num_1;
 
 int get_sem_val(sem_t * sem){
-
 	int sval;
 	sem_getvalue(sem, &sval);
 	return sval;
@@ -38,16 +37,17 @@ void * read_0(){
 			sem_wait(&need_0);
 			buf[0] = temp;
 			sem_post(&rd_0);
+			continue;
 		}	
 		else{
 			sem_wait(&need_1);
 			buf[1] = temp;
 			sem_post(&rd_1);
+			continue;
 		}
 	}
 	have_num_0 = 0;
 	return (void *)0;
-
 }
 
 void * read_1(){
@@ -60,20 +60,24 @@ void * read_1(){
 	}
 	
 	for(int i = 0; !feof(fp); i++){
+
 		have_num_0 = 1;
 		sem_wait(&need);
+
 		fscanf(fp, "%d", &temp);
 		if(get_sem_val(&need_0)){
 			sem_wait(&need_0);
 			buf[0] = temp;
 			sem_post(&rd_0);
+			continue;
 		}	
 		else{
 			sem_wait(&need_1);
 			buf[1] = temp;
 			sem_post(&rd_1);
+			continue;
 		}
-		
+
 		for(int i = 0; i < 2; i++){
 			printf("%d\n", buf[i]);
 		}
@@ -87,11 +91,15 @@ void * multp(){
 	while(have_num_1 || have_num_0){
 		sem_wait(&rd_0);
 		sem_wait(&rd_1);
-		printf("%d * %d = %d\n", buf[0], buf[1], (buf[0] * buf[1]));
+		int fac_1 = buf[0];
+		int fac_2 = buf[1];
+
 		sem_post(&need_1);
 		sem_post(&need);
 		sem_post(&need_0);
 		sem_post(&need);
+		printf("%d * %d = %d\n", buf[0], buf[1], (buf[0] * buf[1]));
+		
 	}
 
 	return (void *)0;
@@ -100,11 +108,14 @@ void * add(){
 	while(have_num_1 || have_num_0){
 		sem_wait(&rd_0);
 		sem_wait(&rd_1);
-		printf("%d + %d = %d\n", buf[0], buf[1], (buf[0] + buf[1]));
+		int fac_1 = buf[0];
+		int fac_2 = buf[1];
 		sem_post(&need_1);
 		sem_post(&need);
 		sem_post(&need_0);
 		sem_post(&need);
+		printf("%d + %d = %d\n", buf[0], buf[1], (buf[0] + buf[1]));
+
 	}
 
 	return (void *)0;
@@ -114,22 +125,34 @@ void * add(){
 
 
 int main(int argc, char const * argv[]){
+	// printf("start\n");
 	sem_init(&need, 0, 2);
 	sem_init(&need_0, 0, 1);
 	sem_init(&need_1, 0, 1);
+	sem_init(&rd_1, 0, 0);
+	sem_init(&rd_0, 0, 0);
+
+
 	pthread_t id_add;
 	pthread_t id_mul;
 	pthread_t id_r_0;
 	pthread_t id_r_1;
 	pthread_create(&id_r_0, NULL, (void *)read_0, NULL);
+
 	pthread_create(&id_r_1, NULL, (void *)read_1, NULL);
 	pthread_create(&id_add, NULL, (void *)multp, NULL);
 	pthread_create(&id_mul, NULL, (void *)add, NULL);
-	// sleep(5);
+
+
+	// sleep(10);
 	pthread_join(&id_r_0, NULL);
 	pthread_join(&id_r_1, NULL);
 	pthread_join(&id_add, NULL);
 	pthread_join(&id_mul, NULL);
+	
+
+
+
 	return 0;
 
 }
@@ -161,3 +184,17 @@ int main(int argc, char const * argv[]){
 // 8 + -10 = -2
 // 9 + -10 = -1
 // [Finished in 5.2s]
+
+// ryan@ubuntu:~/Desktop/os/04$ ./semaphore
+// read_1
+// read_0
+// -1 + -2 = -3
+// -3 + -4 = -7
+// 1 + 2 = 3
+// -5 + -6 = -11
+// -7 + -8 = -15
+// -9 + -10 = -19
+// 3 * 4 = 12
+// 5 * 6 = 30
+// 7 * 8 = 56
+// 9 * 10 = 90
