@@ -5,19 +5,20 @@
 sem_t s;
 
 void thread1(){
+	printf("This is thread1\n");
 	printf("s before wait = %d\n", s);
 	sem_wait(&s);
 	printf("s after wait = %d\n", s);
-	printf("This is thread1\n");
+	
 	return;
 }
 
 void thread2(){
 	printf("This is thread2\n");
-	printf("s before post = %d", s);
+	printf("s before post = %d\n", s);
 
 	sem_post(&s);
-	printf("s after post = %d", s);
+	printf("s after post = %d\n", s);
 	return;
 }
 
