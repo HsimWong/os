@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
 {
 	pthread_t id;
 	pthread_create(&id, NULL, (void *)thread, NULL);
-	thread_join(id, NULL);
-	print("This is main");
+	pthread_join(id, NULL);
+	printf("This is main");
 	return 0;
 }
