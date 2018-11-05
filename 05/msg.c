@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-
+#include <string.h>
+#include <errno.h>
 bool is_exit(char * str){
 	char * exit = "exit()";
 	bool ret = false;
@@ -20,7 +22,7 @@ bool is_exit(char * str){
 struct msg_st{
 	long int msg_type;
 	char text[256];
-}
+};
 
 int main(int argc, char const *argv[])
 {
@@ -31,19 +33,24 @@ int main(int argc, char const *argv[])
 	if(child_0){
 		int msg_id = -1;
 		struct msg_st data;
-		msg_id = msgget((key_t)1234, IPC_CREAT | 0666);
+		long int msg_type = 0;
+		msg_id = msgget((key_t)1234, IPC_CREAT);
 		if(msg_id == -1){
 			printf("msgget failed\n");
-			exit(EXIT_FALURE);
+			exit(EXIT_FAILURE);
 		}
 		printf("Receiver start\n");
 		while(1){
 			int status = msgrcv(msg_id, (void*)&data, 256, msg_type, 0);
+			if(is_exit(data.text)){
+				exit(EXIT_SUCCESS);
+				break;
+			}
 			if(status == -1){
 				printf("msgrcv failed\n");
 				exit(EXIT_FAILURE);
 			}
-			printf("Message from sender:%s\n", data.text)
+			printf("Message from sender:%s\n", data.text);
 			
 		}
 	}
@@ -51,16 +58,16 @@ int main(int argc, char const *argv[])
 	// sender process
 	else{
 		
-		while(true){
+		while(1){
 			int max_size = 256;
 			// char * msg_1 = "This is a message";
 			// char * msg_2 = "This is another message";
-			char * msg[256];
-			memset(buffer, '\0', 256);
+			char msg[256];
+			memset(msg, '\0', 256);
 			//int msg_id = -1;
 			struct msg_st data;
 			long int msg_type = 0;
-			int msg_id = msgget((key_t)1234, IPC_CREAT | 0666);
+			int msg_id = msgget((key_t)1234, IPC_CREAT);
 			if(msg_id == -1){
 				printf("msgget failed\n");
 				exit(EXIT_FAILURE);
@@ -70,9 +77,12 @@ int main(int argc, char const *argv[])
 				printf("Enter a string\n");
 				fgets(msg, 256, stdin);
 				strcpy(data.text, msg);
+				printf("sending: %s",data.text);
+				printf("is exit() %d\n", is_exit(data.text));
 				data.msg_type = 1;
 				if(is_exit(data.text)){
 					break;
+
 				}
 				msgsnd(msg_id, (void * )&data, 256, 0);
 			}
