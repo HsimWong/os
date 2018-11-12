@@ -1,6 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <semaphore.h>
+#include <pthread.h>
+
+
+
+
+
+
+
 
 int buf[2];
 sem_t need;
