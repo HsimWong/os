@@ -52,13 +52,17 @@ int main(int argc, char const * argv[]){
 	if(pid > 0){
 		while(1){
 			struct mybuf buf;
-			if(abort){
-				printf("abort");
-				exit(1);
-			}
+			// if(abort == 1){
+			// 	printf("abort");
+			// 	break;
+			// }
 			int msg_id = msgget(MSG_KEY, IPC_CREAT | 0666);
 			msgrcv(msg_id, &buf, sizeof(buf.text), 0, MSG_NOERROR);
-			
+			if(buf.text[0] == 'e' && buf.text[1] == 'x' && buf.text[2] == 'i' && buf.text[3] == 't'){
+				// printf("Goodbye");
+				// abort = 1;
+				break;
+			}
 			printf("Message received: %s\n", buf.text);
 			// wait(pid);
 		}		
@@ -69,14 +73,14 @@ int main(int argc, char const * argv[]){
 			int msg_id = msgget(MSG_KEY, IPC_CREAT | 0666);
 			printf("Please input your message:\n");
 			fgets(buf.text, sizeof(buf.text), stdin);
-			if(buf.text[0] == 'e' && buf.text[1] == 'x' && buf.text[2] == 'i' && buf.text[3] == 't'){
-				printf("Goodbye");
-				abort = 1;
-				exit(1);
-			}
+			
 			buf.mtype = 1000;
 			msgsnd(msg_id, &buf, sizeof(buf.text), IPC_NOWAIT);
-			
+			if(buf.text[0] == 'e' && buf.text[1] == 'x' && buf.text[2] == 'i' && buf.text[3] == 't'){
+				printf("Goodbye\n");
+				abort = 1;
+				break;
+			}
 			/* Put the current process into ready queue*/
 			sleep(0);
 		}
