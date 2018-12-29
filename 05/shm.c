@@ -19,7 +19,7 @@ int main(){
 		}
 		printf("Their second power values are:\n");
 		for (int i = 0; i < 10; i++){
-			printf("%d\n",(int)(*(addr + i * sizeof(int)) * (*(addr + i * sizeof(int)))));
+			printf("%ld\n",(long int)(*(addr + i * sizeof(int)) * (*(addr + i * sizeof(int)))));
 		}
 		shmdt(addr);
 		shmctl(shid, IPC_RMID, 0);
