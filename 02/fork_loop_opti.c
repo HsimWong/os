@@ -7,7 +7,7 @@ int main(int argc, char const *argv[]){
     int pid_1 = fork();
     if(pid_1){
         /* Activity declaration of Father's process*/
-        // wait(pid_1);
+        wait(pid_1);
         /* print loop here.*/
         for(int i = 0; i < 1000; i++){
             if(i % 10 == 0){

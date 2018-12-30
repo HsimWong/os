@@ -12,6 +12,7 @@ int main(int argc, char const *argv[]){
 
 	/* Use fork() function to establish a new process.*/	
 	int pid_1 = fork();
+	int pid_2 = fork();
 	if(pid_1){	
 		/* Activity declaration of Father's process*/
 		wait(pid_1);
@@ -22,13 +23,13 @@ int main(int argc, char const *argv[]){
 		printf("%s\n", buf_read);
 	}
 
-	else{
-		int pid_2 = fork();		// Another process is established.
+	else{// Another process is established.
 		/* Here declares what sons are doing */
 		if(pid_2){
 			/* Declaration of son
 			 * Son process reading from field[1] requires
 		 	 * close() function on field[0].*/
+			wait(pid_2);
 			close(field[0]);
 			char * info = "Child 1 sends a message.";
 			write(field[1], info, strlen(info));
