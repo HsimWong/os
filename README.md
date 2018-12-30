@@ -61,7 +61,6 @@ int main(int argc, char const *argv[]){
 		int pid_2 = fork();		// Another process is established.
 		/* Here declares what sons are doing */
 		if(pid_2 == 0){
-            
 			/* Declaration of Grandson*/
 			printf("Grandson's getpid = %d\n", getpid());
 			printf("Grandson's pid_1 = %d\n", pid_1);
@@ -126,12 +125,12 @@ ubuntu@VM-0-6-ubuntu:~/os/02$
 #include<string.h>
 
 int main(int argc, char const *argv[]){
-	/* Use fork() function to establish a new process.*/	
-	int pid_1 = fork();
-	if(pid_1){	
-		/* Activity declaration of Father's process*/
-		// wait(pid_1);
-		/* print loop here.*/
+    /* Use fork() function to establish a new process.*/	
+    int pid_1 = fork();
+    if(pid_1){
+        /* Activity declaration of Father's process*/
+        // wait(pid_1);
+        /* print loop here.*/
         for(int i = 0; i < 1000; i++){
             if(i % 10 == 0){
                 printf("a ");
@@ -141,11 +140,11 @@ int main(int argc, char const *argv[]){
 	}
 
 	else{
-		int pid_2 = fork();		// Another process is established.
-		/* Here declares what sons are doing */
-		if(pid_2){
-			/* Declaration of son process */
-		    wait(pid_2);
+        int pid_2 = fork();		// Another process is established.
+        /* Here declares what sons are doing */
+        if(pid_2){
+            /* Declaration of son process */
+            wait(pid_2);
             for(int i = 0; i < 1000; i++){
                 if(i % 10 == 0){
                     printf("b ");
@@ -153,36 +152,33 @@ int main(int argc, char const *argv[]){
                 printf("\n");
             }
         }
-		else{
-			/* Declaration of Grandson*/
+        else{
+            /* Declaration of Grandson*/
             /* print loop here.*/
-			for(int i = 0; i < 1000; i++){
+            for(int i = 0; i < 1000; i++){
                 if(i % 10 == 0){
                     printf("a ");
                 }
             }
             printf("\n");
-		}
-	}
-	return 0;
+        }
+    }
+    return 0;
 }
 ```
 上面代码中三个进程均有一共同特点，为运行时间长的批处理任务。得到的运行结果如下所示：
 
 *代码2-3 运行结果*
 ```bash
-ubuntu@VM-0-6-ubuntu:~/os/02$ gcc fork_2.c
+ubuntu@VM-0-6-ubuntu:~/os/02$ gcc fork_loop.c
+fork_loop.c: In function 憁ain?
+fork_loop.c:25:13: warning: implicit declaration of function 憌ait?[-Wimplicit-function-declaration]
+             wait(pid_2);
+             ^
 ubuntu@VM-0-6-ubuntu:~/os/02$ ./a.out
-MainProcess's getpid() = 31461
-Parent's getpid() = 31461
-Parent's pid_1 = 31462
-Son's getpid() = 31462
-Son's pid_1 = 0
-Son's pid_2 = 31463
-Child 1 sends a message.////////
-a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a ubuntu@VM-0-6-ubuntu:~/os/02$ b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b Grandson's getpid = 31463
-Grandson's pid_1 = 0
-Grandson's pid_2 = 0
+a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a
+ubuntu@VM-0-6-ubuntu:~/os/02$ c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c
+b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b
 ```
 我们可以看到，尽管在同一个代码块当中，```a```的循环输出并不紧接着信息打印后进行，而是在第一子进程的信息打印完成后才进行。等到```b```打印时候，整个程序已经结束，出现了继续输入命令的提示符。而在第二子进程进行的时候，甚至都没有进行完全便关闭了控制台的输出，可以看出，系统调度进程采用了**时间片轮转**的方法，等到父进程结束，子进程自动结束。而无法预知父进程何时结束，有可能在子进程还没有完成时，父进程便退出了，所以我们应该控制进程的执行顺序。
 
@@ -190,24 +186,84 @@ Grandson's pid_2 = 0
 
 *代码2-4    改进后的代码2-3的运行结果*
 ```bash
-ubuntu@VM-0-6-ubuntu:~/os/02$ gcc fork_2.c
-fork_2.c: In function 憁ain?
-fork_2.c:14:3: warning: implicit declaration of function 憌ait?[-Wimplicit-function-declaration]
-   wait(pid_1);
-   ^
+ubuntu@VM-0-6-ubuntu:~/os/02$ gcc fork_loop_opti.c
+fork_loop_opti.c: In function 憁ain?
+fork_loop_opti.c:10:9: warning: implicit declaration of function 憌ait?[-Wimplicit-function-declaration]
+         wait(pid_1);
+         ^
 ubuntu@VM-0-6-ubuntu:~/os/02$ ./a.out
-MainProcess's getpid() = 2184
-Grandson's getpid = 2186
-Grandson's pid_1 = 0
-Grandson's pid_2 = 0
-c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c Son's getpid() = 2185
-Son's pid_1 = 0
-Son's pid_2 = 2186
-b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b Parent's getpid() = 2184
-Parent's pid_1 = 2185
-Child 2 sends a message.////////
-a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a ubuntu@VM-0-6-ubuntu:~/os/02$
+c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c c
+b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b
+a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a
+ubuntu@VM-0-6-ubuntu:~/os/02$
+
 ```
 
 ## 2.3  进程的管道通信
-由于
+进程的管道通信是通过一个长度为2的数组进行串行通信，使用```read()```函数进行读取，```write()```函数进行写入，从而新型进程间通信。实现的代码如下所示，代码中的注释详细说明了每部分的作用。
+
+*代码2-5    管道通信代码*    
+```c
+#include<stdio.h>
+#include<unistd.h>
+#include<string.h>
+
+int main(int argc, char const *argv[]){
+	/* Description of establishment of pipe.
+	 * In this scope, field[0] is opened for reading
+	 * while field[1] is opened for writing*/
+	int field[2];			// pipe field[2] declaration
+	pipe(field);			// pipe() for initialization
+	char buf_read[200];
+
+	/* Use fork() function to establish a new process.*/	
+	int pid_1 = fork();
+	if(pid_1){	
+		/* Activity declaration of Father's process*/
+		wait(pid_1);
+		/* Father process reading from field[0] requires
+		 * close() function on field[1].*/
+		close(field[1]);
+		read(field[0], buf_read, 24);
+		printf("%s\n", buf_read);
+	}
+
+	else{
+		int pid_2 = fork();		// Another process is established.
+		/* Here declares what sons are doing */
+		if(pid_2){
+			/* Declaration of son
+			 * Son process reading from field[1] requires
+		 	 * close() function on field[0].*/
+			close(field[0]);
+			char * info = "Child 1 sends a message.";
+			write(field[1], info, strlen(info));
+		}
+		else{
+			/* Declaration of Grandson
+			 * Grandson process reading from field[0] requires
+		 	 * close() function on field[0].*/
+			close(field[0]);
+			char * info = "Child 2 sends a message.";
+			write(field[1], info, strlen(info));
+		}
+	}
+	return 0;
+}
+```
+
+其运行结果如下所示：
+
+*代码2-6    管道通信运行结果*
+```bash
+ubuntu@VM-0-6-ubuntu:~/os/02$ gcc pipe.c
+pipe.c: In function ‘main’:
+pipe.c:18:3: warning: implicit declaration of function ‘wait’ [-Wimplicit-function-declaration]
+   wait(pid_1);
+   ^
+ubuntu@VM-0-6-ubuntu:~/os/02$ ./a.out
+Child 2 sends a message.
+Child 1 sends a message.
+ubuntu@VM-0-6-ubuntu:~/os/02$
+```
+
