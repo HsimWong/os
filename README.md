@@ -43,13 +43,6 @@ int main(int argc, char const *argv[]){
 	 * Use getpid() to get current pid #.*/
 	printf("MainProcess's getpid() = %d\n", getpid());
 
-	/* Description of establishment of pipe.
-	 * In this scope, field[0] is opened for reading
-	 * while field[1] is opened for writing*/
-	int field[2];			// pipe field[2] declaration
-	pipe(field);			// pipe() for initialization
-	char buf_read[200];
-
 	/* Use fork() function to establish a new process.*/	
 	int pid_1 = fork();
 	
@@ -62,9 +55,6 @@ int main(int argc, char const *argv[]){
 		wait(pid_1);
 		printf("Parent's getpid() = %d\n", getpid());
 		printf("Parent's pid_1 = %d\n", pid_1);
-		close(field[1]);
-		read(field[0], buf_read, 24);
-		printf("%s\n", buf_read);
 	}
 
 	else{
@@ -76,17 +66,11 @@ int main(int argc, char const *argv[]){
 			printf("Grandson's getpid = %d\n", getpid());
 			printf("Grandson's pid_1 = %d\n", pid_1);
 			printf("Grandson's pid_2 = %d\n", pid_2);
-			close(field[0]);
-			char * info = "Child 2 sends a message.";
-			write(field[1], info, strlen(info));
 		}else{
 			/* Declaration of Son process*/
 			printf("Son's getpid() = %d\n", getpid());
 			printf("Son's pid_1 = %d\n", pid_1);
 			printf("Son's pid_2 = %d\n", pid_2);
-			close(field[0]);
-			char * info = "Child 1 sends a message.";
-			write(field[1], info, strlen(info));
 		}
 	}
 	return 0;
@@ -137,65 +121,51 @@ ubuntu@VM-0-6-ubuntu:~/os/02$
 
 *代码2-2    修改后带有循环输出的子进程创建代码*
 ```c
-  1 #include<stdio.h>
-  2 #include<unistd.h>
-  3 #include<string.h>
-  4
-  5 int main(int argc, char const *argv[]){
-  6     printf("MainProcess's getpid() = %d\n", getpid());
-  7     int field[2];           // pipe field[2] declaration
-  8     pipe(field);            // pipe() for initialization
-  9     char buf_read[200];
- 10
- 11     int pid_1 = fork();
- 12
- 13     if(pid_1){
- 14         // wait(pid_1);
- 15         printf("Parent's getpid() = %d\n", getpid());
- 16         printf("Parent's pid_1 = %d\n", pid_1);
- 17         close(field[1]);
- 18         read(field[0], buf_read, 24);
- 19         printf("%s\n", buf_read);
- 20         /* Loop for output is added here */
- 21         for(int i = 0; i < 1000; i++){
- 22             printf("a ");
- 23         }
- 24     }
- 25
- 26     else{
- 27         int pid_2 = fork();     // Another process is established.
- 28         if(pid_2){
- 29             // wait(pid_2);
- 30             printf("Son's getpid() = %d\n", getpid());
- 31             printf("Son's pid_1 = %d\n", pid_1);
- 32             printf("Son's pid_2 = %d\n", pid_2);
- 33             close(field[0]);
- 34             char * info = "Child 1 sends a message.";
- 35             write(field[1], info, strlen(info));
- 36             /* Loop for output is added here */
- 37             for(int i = 0; i < 1000; i++){
- 38                 printf("b ");
- 39             }
- 40         }
- 41
- 42         else{
- 43             /* Declaration of Grandson*/
- 44             printf("Grandson's getpid = %d\n", getpid());
- 45             printf("Grandson's pid_1 = %d\n", pid_1);
- 46             printf("Grandson's pid_2 = %d\n", pid_2);
- 47             close(field[0]);
- 48             char * info = "Child 2 sends a message.";
- 49             write(field[1], info, strlen(info));
- 50             /* Loop for output is added here */
- 51             for(int i = 0; i < 1000; i++){
- 52                 printf("c ");
- 53             }
- 54         }
- 55     }
- 56     return 0;
- 57 }
+#include<stdio.h>
+#include<unistd.h>
+#include<string.h>
 
+int main(int argc, char const *argv[]){
+	/* Use fork() function to establish a new process.*/	
+	int pid_1 = fork();
+	if(pid_1){	
+		/* Activity declaration of Father's process*/
+		// wait(pid_1);
+		/* print loop here.*/
+        for(int i = 0; i < 1000; i++){
+            if(i % 10 == 0){
+                printf("a ");
+            }
+        }
+        printf("\n");
+	}
 
+	else{
+		int pid_2 = fork();		// Another process is established.
+		/* Here declares what sons are doing */
+		if(pid_2){
+			/* Declaration of son process */
+		    wait(pid_2);
+            for(int i = 0; i < 1000; i++){
+                if(i % 10 == 0){
+                    printf("b ");
+                }
+                printf("\n");
+            }
+        }
+		else{
+			/* Declaration of Grandson*/
+            /* print loop here.*/
+			for(int i = 0; i < 1000; i++){
+                if(i % 10 == 0){
+                    printf("a ");
+                }
+            }
+            printf("\n");
+		}
+	}
+	return 0;
+}
 ```
 上面代码中三个进程均有一共同特点，为运行时间长的批处理任务。得到的运行结果如下所示：
 

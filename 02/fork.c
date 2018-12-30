@@ -26,9 +26,6 @@ int main(int argc, char const *argv[]){
 		wait(pid_1);
 		printf("Parent's getpid() = %d\n", getpid());
 		printf("Parent's pid_1 = %d\n", pid_1);
-		close(field[1]);
-		read(field[0], buf_read, 24);
-		printf("%s\n", buf_read);
 	}
 
 	else{
@@ -39,18 +36,12 @@ int main(int argc, char const *argv[]){
 			printf("Son's getpid() = %d\n", getpid());
 			printf("Son's pid_1 = %d\n", pid_1);
 			printf("Son's pid_2 = %d\n", pid_2);
-			close(field[0]);
-			char * info = "Child 1 sends a message.";
-			write(field[1], info, strlen(info));
 		}
 		else{
 			/* Declaration of Grandson*/
 			printf("Grandson's getpid = %d\n", getpid());
 			printf("Grandson's pid_1 = %d\n", pid_1);
 			printf("Grandson's pid_2 = %d\n", pid_2);
-			close(field[0]);
-			char * info = "Child 2 sends a message.";
-			write(field[1], info, strlen(info));
 		}
 	}
 	return 0;
