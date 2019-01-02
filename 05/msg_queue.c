@@ -8,80 +8,50 @@
 // message queue establising: int msgget(key_t key, int msgflg);
 // message send: int msgsnd(msgid, msgp, size, flag);
 
-
-
-
-int open_queue(int keyval){
-	int qid;
-	qid = msgget(keyval, IPC_CREAT | 0666);
-	if(qid == -1){
-		perror("Failed in calling msgget");
-		return (-1);
-		
-	}
-	return qid;
-}
-
+/* Define a set of message as a strcture.*/
 struct mybuf{
 	long mtype;
 	char text[256];
 };
 
-
-// int is_exit(char * str){
-// 	char e[256] = "exit";
-// 	for(int i = 0; i < 4; i++){
-// 		if(*(e + i) != *(str + i)){
-// 			return 0;
-// 		}
-// 	}
-// 	return 1;
-// }
-
-int abort = 0;
-
-
 int main(int argc, char const * argv[]){
-	// int key_val = 0;
-	// if(open_queue(key_val) != -1){
-	// 	printf("calling msgget success\n");
-	// }
 
 	int pid = fork();
 	
 	if(pid > 0){
 		while(1){
 			struct mybuf buf;
-			// if(abort == 1){
-			// 	printf("abort");
-			// 	break;
-			// }
+			/* Message queue establishment*/
 			int msg_id = msgget(MSG_KEY, IPC_CREAT | 0666);
+			/* Receive message from queue and cp . buf*/
 			msgrcv(msg_id, &buf, sizeof(buf.text), 0, MSG_NOERROR);
+			/* Check if the message received === 'exit' */
 			if(buf.text[0] == 'e' && buf.text[1] == 'x' && buf.text[2] == 'i' && buf.text[3] == 't'){
-				// printf("Goodbye");
-				// abort = 1;
 				break;
 			}
+			/* Print the message */
 			printf("Message received: %s\n", buf.text);
-			// wait(pid);
 		}		
 	}
 	else{
 		while(1){
 			struct mybuf buf;
+			/* Message queue establishment*/
 			int msg_id = msgget(MSG_KEY, IPC_CREAT | 0666);
+			/* Receive message from console and print */
 			printf("Please input your message:\n");
 			fgets(buf.text, sizeof(buf.text), stdin);
 			
 			buf.mtype = 1000;
+			/* Send the message */
 			msgsnd(msg_id, &buf, sizeof(buf.text), IPC_NOWAIT);
+			/* Check if the message received === 'exit' */
 			if(buf.text[0] == 'e' && buf.text[1] == 'x' && buf.text[2] == 'i' && buf.text[3] == 't'){
 				printf("Goodbye\n");
 				abort = 1;
 				break;
 			}
-			/* Put the current process into ready queue*/
+			/* Put the current process into READY QUEUE */
 			sleep(0);
 		}
 	}

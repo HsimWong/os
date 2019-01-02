@@ -2,7 +2,6 @@
 #include <pthread.h>
 
 void * myThread1(void * chr){
-	// printf("This line is printed by thread 1\n");
 	char * temp = (char *)chr;
 	printf("%c\n", * temp);
 	return (void *)0;
@@ -27,6 +26,5 @@ int main(int argc, char const *argv[])
 	int ret_2 = pthread_create(&id_2, NULL, (void *)myThread2, (void *)&num);
 	pthread_join(id_2, NULL);
 	printf("This is printed by main thread\n");
-	// return 0;
 	return 0;
 }

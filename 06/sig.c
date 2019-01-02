@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <signal.h>
 
+/* Definition of action taken after SIGINT receives*/
 static void sig_int(int no){
 	printf("recieved SIGINT signal:%d\n", no);
 	printf("pid of this process is %d\n", getpid());
 	return;
 }
-
+/* Definition of action taken after SIGINT receives*/
 static void sig_usr(int no){
 		printf("received SIGUSR1 signal:%d\n", no);
 		printf("pid of this process is %d\n", getpid());
@@ -28,11 +29,5 @@ int main(){
 				
 				for(;;);
 		}
-		return 0;
-
-
-//		signal(SIGINT, myfunc);
-
-
 		return 0;
 }
